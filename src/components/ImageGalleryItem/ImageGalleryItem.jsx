@@ -9,22 +9,21 @@ export const ImageGalleryItem = ({ imageURL }) => {
   );
 };
 
+const ImageContainer = styled.li`
+  border-radius: 2px;
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+`;
+
 const ImageItem = styled.img`
   width: 100%;
-  height: 100%;
-  transition: all 0.4s ease-in;
-
+  height: 260px;
   object-fit: cover;
-  border-radius: 8px;
-  &:hover {
-    cursor: pointer;
-    transform: translateY(-5px);
-    box-shadow: 3px 4px 2px 0 lightblue;
-    scale: 1.1;
+  transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover,
+  &:focus {
+    transform: scale(1.03);
+    cursor: zoom-in;
   }
 `;
-const ImageContainer = styled.li`
-  list-style: none;
-  border-radius: 8px;
-  overflow: hidden;
-`;
+
