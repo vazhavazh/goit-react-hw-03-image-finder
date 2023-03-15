@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 
-
 import styled from 'styled-components';
 import { ProgressBar } from 'react-loader-spinner';
 import { Fetch } from './Fetch';
-import {ImageGallery} from './ImageGallery/ImageGallery'
+import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/SearchBar';
 
 const statusList = {
@@ -20,6 +19,8 @@ export class App extends Component {
     error: null,
     searchQuery: 'cars',
     status: statusList.idle,
+    currentPage: 1,
+    largeImg: '',
   };
   handleSubmit = str => {
     this.setState({ searchQuery: str });
@@ -35,12 +36,31 @@ export class App extends Component {
     }
   };
 
+  loadMore = () => {
+    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
+  };
+
   componentDidMount() {
     this.handleGetImages();
   }
-  componentDidUpdate(prevProps, prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
-      this.handleGetImages();
+      await this.handleGetImages();
+    }
+
+    if (prevState.currentPage !== this.state.currentPage) {
+      try {
+        const res = await Fetch(
+          this.state.searchQuery,
+          this.state.currentPage
+        );
+        this.setState(prevState => ({
+          images: [...prevState.images, ...res.hits],
+          status: statusList.success,
+        }));
+      } catch (error) {
+        this.setState({ error, status: statusList.error });
+      }
     }
   }
 
@@ -69,7 +89,8 @@ export class App extends Component {
       return (
         <>
           <SearchBar onSubmit={this.handleSubmit} />
-          <ImageGallery images={images}/>
+          <ImageGallery images={images} />
+          <button onClick={this.loadMore}>Load More</button>
         </>
       );
     }
