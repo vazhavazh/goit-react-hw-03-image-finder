@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
-import styled from 'styled-components';
 import { ProgressBar } from 'react-loader-spinner';
-import { GetImages } from './GetImages';
+import { GetImages } from '../api/GetImages';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/SearchBar';
 import { Modal } from './Modal/Modal';
+import { ButtonLoadMore } from './ButtonLoadMore/ButtonLoadMore';
+
+import { Span, MainContainer, Preloader } from './AppStyled';
 
 const statusList = {
   loading: 'loading',
@@ -110,7 +112,7 @@ export class App extends Component {
   };
 
   render() {
-    const { images, status, hasMoreImages, hasImages, } = this.state;
+    const { images, status, hasMoreImages, hasImages } = this.state;
 
     if (status === statusList.loading) {
       return (
@@ -164,44 +166,3 @@ export class App extends Component {
     }
   }
 }
-
-const Span = styled.span`
-  text-align: center;
-`;
-const MainContainer = styled.div`
-
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-gap: 16px;
-  padding-bottom: 24px;
-`;
-
-const Preloader = styled.div`
-  height: 90vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-
-const ButtonLoadMore = styled.div`
-z-index: 0;
-
-  display: inline-block;
-  margin: 0 auto;
-  width: 48px;
-  height: 48px;
-  border: 0;
-  background-image: url('https://cdn-icons-png.flaticon.com/512/2810/2810409.png');
-  background-size: 100%;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.6;
-  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-  outline: none;
-  &:hover,
-  &:focus {
-    opacity: 1;
-  }
-`;

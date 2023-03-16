@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import PropTypes from 'prop-types'
+
+import { Overlay, ModalContent, ModalImg } from './ModalStyled';
 
 export class Modal extends Component {
   componentDidMount() {
@@ -27,7 +29,7 @@ export class Modal extends Component {
       <div>
         <Overlay onClick={this.closeModalBackdrop}>
           <ModalContent>
-            <ModalImg src={largeImg} alt="" />
+            <ModalImg src={largeImg} alt="large image" />
           </ModalContent>
         </Overlay>
       </div>
@@ -35,23 +37,7 @@ export class Modal extends Component {
   }
 }
 
-
-
-const Overlay = styled.div`
-overflow: hidden;
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.863);
-`;
-
-const ModalContent = styled.div`
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-`;
-
-const ModalImg = styled.img`
-  min-width: 100%;
-  min-height: 100%;
-`;
+Modal.propTypes = {
+  largeImg: PropTypes.string.isRequired,
+  onModalClose: PropTypes.func.isRequired
+};
