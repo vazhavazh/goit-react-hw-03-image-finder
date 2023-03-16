@@ -1,13 +1,31 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export const ImageGalleryItem = ({ imageURL }) => {
+export const ImageGalleryItem = ({ images, onClickImage, toggleModal }) => {
+  const handle = e => {
+    toggleModal();
+    onClickImage(e.currentTarget.dataset.largeImage);
+  };
+  
   return (
-    <ImageContainer>
-      <ImageItem src={imageURL} alt="img" />
-    </ImageContainer>
+    <>
+      {images.map((image, index) => (
+        <ImageContainer
+          key={index}
+          onClick={handle}
+          data-large-image={image.largeImageURL}
+        >
+          <ImageItem src={image.webformatURL} alt={image.name} />
+        </ImageContainer>
+      ))}
+    </>
   );
 };
+
+
+
+
+
 
 const ImageContainer = styled.li`
   border-radius: 2px;

@@ -2,15 +2,18 @@ import styled from "styled-components"
 import { ImageGalleryItem } from "components/ImageGalleryItem/ImageGalleryItem";
 
 
-export const ImageGallery = ({ images }) => {
-    return (
-      <Gallery>
-        {images.map(image => (
-          <ImageGalleryItem key={image.id} imageURL={image.webformatURL} />
-        ))}
-      </Gallery>
-    );
-}
+export const ImageGallery = ({ images, toggleModal, onClickImage }) => {
+  return (
+    <Gallery>
+      <ImageGalleryItem
+        images={images}
+        onClickImage={onClickImage}
+        toggleModal={toggleModal}
+      />
+    </Gallery>
+  );
+};
+
 
 
 

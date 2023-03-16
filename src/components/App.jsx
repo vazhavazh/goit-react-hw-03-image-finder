@@ -2,9 +2,10 @@ import React, { Component } from 'react';
 
 import styled from 'styled-components';
 import { ProgressBar } from 'react-loader-spinner';
-import { Fetch } from './Fetch';
+import { GetImages } from './GetImages';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { SearchBar } from './SearchBar/SearchBar';
+import { Modal } from './Modal/Modal';
 
 const statusList = {
   loading: 'loading',
@@ -17,45 +18,77 @@ export class App extends Component {
   state = {
     images: [],
     error: null,
-    searchQuery: 'cars',
+    searchQuery: '',
     status: statusList.idle,
     currentPage: 1,
+    isOpen: false,
     largeImg: '',
+    hasMoreImages: false,
+    hasImages: false,
   };
   handleSubmit = str => {
-    this.setState({ searchQuery: str });
+    this.setState({
+      searchQuery: str,
+      images: [],
+      hasImages: false,
+    });
   };
 
   handleGetImages = async () => {
+    this.setState({
+      status: statusList.loading,
+      hasImages: true,
+      hasMoreImages: true,
+    });
     try {
-      this.setState({ status: statusList.loading });
-      const res = await Fetch(this.state.searchQuery);
-      this.setState({ images: res.hits, status: statusList.success });
+      const res = await GetImages(
+        this.state.searchQuery,
+        this.state.currentPage
+      );
+      if (res.data.hits.length === 0) {
+        this.setState({
+          hasImages: false,
+          hasMoreImages: false,
+        });
+      }
+      this.setState({
+        images: res.data.hits,
+        status: statusList.success,
+      });
     } catch (error) {
       this.setState({ error, status: statusList.error });
     }
   };
 
-  loadMore = () => {
-    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
-  };
-
-  componentDidMount() {
-    this.handleGetImages();
+  async componentDidMount() {
+    await this.handleGetImages();
   }
+
   async componentDidUpdate(prevProps, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery) {
+      this.setState({
+        currentPage: 1,
+        images: [],
+      });
       await this.handleGetImages();
     }
 
     if (prevState.currentPage !== this.state.currentPage) {
       try {
-        const res = await Fetch(
+        const res = await GetImages(
           this.state.searchQuery,
           this.state.currentPage
         );
+        if (res.data.hits.length === 0) {
+          this.setState(prevState => ({
+            currentPage: prevState.currentPage,
+          }));
+          this.setState({
+            hasMoreImages: false,
+          });
+        }
         this.setState(prevState => ({
-          images: [...prevState.images, ...res.hits],
+          images: [...prevState.images, ...res.data.hits],
           status: statusList.success,
         }));
       } catch (error) {
@@ -63,9 +96,22 @@ export class App extends Component {
       }
     }
   }
+  loadMore = () => {
+    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
+  };
+  toggleModal = () => {
+    this.setState(prevState => ({
+      isOpen: !prevState.isOpen,
+    }));
+  };
+
+  setImg = largeImg => {
+    this.setState({ largeImg });
+  };
 
   render() {
-    const { images, status } = this.state;
+    const { images, status, hasMoreImages, hasImages, } = this.state;
+
     if (status === statusList.loading) {
       return (
         <MainContainer>
@@ -78,29 +124,52 @@ export class App extends Component {
               ariaLabel="blocks-loading"
               wrapperStyle={{}}
               wrapperClass="blocks-wrapper"
-              colors={['#e15b64', '#ff3300', '#f8b26a', '#b3ff00', '#849b87']}
+              colors={['#e15b64', '#ff3300', '#f3f86a', '#3f51b5', '#849b87']}
             />
-            <h1>Loading....</h1>
           </Preloader>
         </MainContainer>
       );
     }
     if (status === statusList.success || status === statusList.idle) {
       return (
-        <>
+        <MainContainer>
           <SearchBar onSubmit={this.handleSubmit} />
-          <ImageGallery images={images} />
-          <button onClick={this.loadMore}>Load More</button>
-        </>
+          {hasImages ? (
+            <ImageGallery
+              images={images}
+              onClickImage={this.setImg}
+              toggleModal={this.toggleModal}
+            />
+          ) : (
+            <Span>
+              I'm sorry, but I have never encountered anything like this before{' '}
+            </Span>
+          )}
+          {this.state.isOpen && (
+            <Modal
+              onModalClose={this.toggleModal}
+              largeImg={this.state.largeImg}
+            />
+          )}
+          {hasMoreImages && !this.state.isOpen && (
+            <ButtonLoadMore onClick={this.loadMore} />
+          )}
+          {!hasMoreImages && hasImages ? (
+            <Span>Sorry, but there are no more images available...</Span>
+          ) : (
+            console.log()
+          )}
+        </MainContainer>
       );
-    }
-    if (status === statusList.error && status !== statusList.loading) {
-      return <h1>Жодної картинки не знайдено, зробіть інший запит</h1>;
     }
   }
 }
 
+const Span = styled.span`
+  text-align: center;
+`;
 const MainContainer = styled.div`
+
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 16px;
@@ -113,4 +182,26 @@ const Preloader = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+`;
+
+const ButtonLoadMore = styled.div`
+z-index: 0;
+
+  display: inline-block;
+  margin: 0 auto;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/2810/2810409.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.6;
+  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  outline: none;
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
 `;

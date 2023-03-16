@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-// import searchIcon from ''
+
 
 
 export class SearchBar extends React.Component {
@@ -16,7 +16,7 @@ export class SearchBar extends React.Component {
     e.preventDefault();
 
     if (!this.state.searchString) {
-     alert('Заповніть, будь ласка, ваш інпут!');
+     alert('Please write something... ');
       return;
     }
     this.props.onSubmit(this.state.searchString);
@@ -36,7 +36,7 @@ export class SearchBar extends React.Component {
             autoFocus
             placeholder="Search images and photos"
           />
-          <ButtonSearch>
+          <ButtonSearch type='submit'>
             <Span>Search</Span>
           </ButtonSearch>
         </Form>
@@ -93,8 +93,8 @@ const ButtonSearch = styled.button`
   width: 48px;
   height: 48px;
   border: 0;
-  background-image: url('./search-svgrepo-com.svg');
-  background-size: 40%;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/674/674474.png');
+  background-size: 100%;
   background-repeat: no-repeat;
   background-position: center;
   opacity: 0.6;
